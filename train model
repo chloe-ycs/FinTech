@@ -94,7 +94,7 @@ y_pred = gbm.predict(dtest)   #gbm: gradient boosting machine
 print (y_pred.max(), y_pred.min(), y_pred.mean())
 
 
-#Feature importance
+# Feature importance
 importance = gbm.get_fscore()
 print(importance)
 
