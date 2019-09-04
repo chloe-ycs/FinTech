@@ -1,0 +1,141 @@
+# Train model
+## XGBoost
+feat = list(df.columns.values)
+print (feat)
+
+feat.remove('id')
+feat.remove('loanstatus')
+feat.remove('train_flg')
+
+## Preliminary manually parameter tuning based on stratified train-test split
+from sklearn.cross_validation import StratifiedKFold
+from sklearn.cross_validation import train_test_split
+#Kfolds = StratifiedKFold(df_all['loan_status'], n_folds = 3, shuffle=True, random_state=2019)
+
+df_train = df.query("train_flg == 1")
+df_test  = df.query("train_flg == 0" )
+print (df_train.shape, df_test.shape)
+
+# randomly split train set and validation set
+X_train, X_valid, y_train, y_valid = train_test_split(df_train[feat], df_train.loanstatus, 
+                                                      test_size=0.3, 
+                                                      random_state=2016, 
+                                                      stratify = df_train.loanstatus )
+                                                      
+X_test, y_test = df_test[feat], df_test.loanstatus
+dtrain = xgb.DMatrix(X_train, y_train, missing = np.NAN)
+dvalid = xgb.DMatrix(X_valid, y_valid, missing = np.NAN)
+dtest = xgb.DMatrix(X_test, y_test, missing = np.NAN)
+
+params = {"objective": "binary:logistic", 
+          "booster" : "gbtree", 
+          "eta": 0.05, 
+          "max_depth": 6, 
+          "subsample": 0.632, 
+          "colsample_bytree": 0.7,
+          #"colsample_bylevel": 0.6,
+          "silent": 1, 
+          "seed": 1441, 
+          "eval_metric": "auc",
+          #"gamma": 1, 
+          "min_child_weight": 5}
+          
+watchlist = [(dtrain, 'train'), (dvalid, 'eval')]
+num_boost_round = 1500
+
+gbm = xgb.train(params, 
+                dtrain, 
+                num_boost_round, 
+                evals = watchlist,
+                early_stopping_rounds = 50)
+
+
+from sklearn.metrics import roc_curve, auc
+from sklearn import linear_model, datasets
+import pylab as pl
+
+def draw_ROC(model, dtrain, dvalid, dtest, y_train, y_valid, y_test ):
+    
+    probas_ = model.predict(dvalid, ntree_limit = model.best_ntree_limit)
+    probas_1 = model.predict(dtrain, ntree_limit = model.best_ntree_limit)
+    probas_2 = model.predict(dtest, ntree_limit = model.best_ntree_limit)
+    
+    fpr, tpr, thresholds = roc_curve(y_valid, probas_)
+    fpr_1, tpr_1, thresholds_1 = roc_curve(y_train, probas_1)
+    fpr_2, tpr_2, thresholds_2 = roc_curve(y_test, probas_2)
+    
+    roc_auc = auc(fpr, tpr)
+    roc_auc_1 = auc(fpr_1, tpr_1)
+    roc_auc_2 = auc(fpr_2, tpr_2)
+    
+    print ("Area under the ROC curve - validation: %f" % roc_auc)
+    print ("Area under the ROC curve - train: %f" % roc_auc_1)
+    print ("Area under the ROC curve - test: %f" % roc_auc_2)
+    
+    # Plot ROC curve
+    plt.figure(figsize =(8,8))
+    plt.plot(fpr, tpr, label ='ROC curve - test(AUC = %0.2f)' % roc_auc, color='r')
+    plt.plot(fpr_1, tpr_1, label ='ROC curve - train (AUC = %0.2f)' % roc_auc_1, color='b')
+    plt.plot(fpr_2, tpr_2, label ='ROC curve - train (AUC = %0.2f)' % roc_auc_2, color='g')
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.0])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC for lead score model')
+    plt.legend(loc="lower right")
+    plt.show()
+
+# Draw ROC curve
+draw_ROC(gbm, dtrain, dvalid, dtest, y_train, y_valid, y_test)
+
+# Prediction
+y_pred = gbm.predict(dtest)   #gbm: gradient boosting machine
+print (y_pred.max(), y_pred.min(), y_pred.mean())
+
+
+#Feature importance
+importance = gbm.get_fscore()
+print(importance)
+
+df_importance = pd.DataFrame.from_dict(importance,orient='index').reset_index()
+df_importance.rename({0:'fscore','index':'feature'},axis=1,inplace=True)
+#df_importance = pd.DataFrame(importance.items(), columns=['feature', 'fscore'])
+df_importance['fscore'] = df_importance['fscore'] / df_importance['fscore'].sum()
+print(df_importance)
+
+df_importance.sort_values(['fscore'], ascending=False, inplace=True)
+print(df_importance)
+
+
+plt.figure(figsize=(32, 32))
+# df_importance.plot()
+df_importance[:20].plot(kind='barh', x='feature', y='fscore', legend=False, figsize=(10, 10))
+plt.title('XGBoost Feature Importance')
+plt.xlabel('relative importance')
+plt.gcf().savefig('feature_importance_xgb.png')
+
+
+grade_importance = df_importance.query("feature=='grade'")
+subgrade_importance = df_importance.query("feature=='subgrade'")
+intrate_importance = df_importance.query("feature=='intrate'")
+print(grade_importance, subgrade_importance, intrate_importance)
+df_importance.query("feature=='loanamnt'")
+
+
+plt.figure(figsize=(32, 32))
+# df_importance.plot()
+df_importance.plot(kind='barh', x='feature', y='fscore', legend=False, figsize=(6, 10))
+plt.title('XGBoost Feature Importance')
+plt.xlabel('relative importance')
+
+
+
+
+
+
+
+
+
+
+
