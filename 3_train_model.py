@@ -21,7 +21,6 @@ feat.remove('train_flg')
 
 
 ### Preliminary manually parameter tuning based on stratified train-test split
-
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import train_test_split
 #Kfolds = StratifiedKFold(df_all['loan_status'], n_folds = 3, shuffle=True, random_state=2019)
@@ -39,7 +38,6 @@ X_test, y_test = df_test[feat], df_test.loanstatus
 dtrain = xgb.DMatrix(X_train, y_train, missing = np.NAN)
 dvalid = xgb.DMatrix(X_valid, y_valid, missing = np.NAN)
 dtest = xgb.DMatrix(X_test, y_test, missing = np.NAN)
-
 
 params = {"objective": "binary:logistic",
           "booster" : "gbtree",
@@ -72,7 +70,6 @@ gbm = xgb.train(params,
 from sklearn.metrics import roc_curve, auc
 from sklearn import linear_model, datasets
 import pylab as pl
-
 
 def draw_ROC(model, dtrain, dvalid, dtest, y_train, y_valid, y_test):
  probas_ = model.predict(dvalid, ntree_limit= model.best_ntree_limit)
@@ -111,7 +108,6 @@ draw_ROC(gbm, dtrain, dvalid, dtest, y_train, y_valid, y_test)
 # **accoring to the AUC, curretly a well model. How about tuning parameter by Hypertuning - bayes?
 
 
-
 ########################
 ### Predicted values ###
 ########################
@@ -120,7 +116,9 @@ print (y_pred.max(), y_pred.min(), y_pred.mean())
 # 0.70249295 0.006733872 0.13376142 就算是你觉得好到板上钉钉的贷款， 它的风险率是0.6%；很不好的贷款，它的风险率是70.2%
 
 
-### Feature importance
+##########################
+### Feature importance ###
+##########################
 # F-score=(2*precision*recall)/(precision+recall)
 importance = gbm.get_fscore() # no feature_importance in xgboost sklearn package，but get_fscore() is the same function
 print (importance)
