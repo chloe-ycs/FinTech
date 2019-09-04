@@ -1,5 +1,3 @@
-
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -71,7 +69,6 @@ gbm = xgb.train(params,
 ##################
 ### ROC curve  ###
 ##################
-
 from sklearn.metrics import roc_curve, auc
 from sklearn import linear_model, datasets
 import pylab as pl
