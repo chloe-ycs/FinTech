@@ -1,4 +1,4 @@
-# FinTech
+# FinTech - an Automatic Investor for Lending Club
 ## Project Background
 Lending Club is the world leader in p2p lending having issued over $9 billion dollars in loans since they began in 2007. <br>
 
