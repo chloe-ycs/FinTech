@@ -1,4 +1,4 @@
-# FinTech  
+# FinTech
 ## Project Background
 Lending Club is the world leader in p2p lending having issued over $9 billion dollars in loans since they began in 2007. <br>
 
@@ -25,7 +25,7 @@ This model makes the investors choose more easily from thousands of available lo
 - Label Target 
 ### Label Target
 The Feature 'loanstatus' is used as target. Among all the 7 statuses, "Fully Paid" and "Charged Off" refer to those loans whose statuses are fixed, while other statuses may still change over time. 
-In this project only the loans with statuses of "Fully Paid" and "Charged Off" are considered. They are labeled as "0" (no default) and "1" (default), respectively.
+In this project, only the loans with statuses of "Fully Paid" and "Charged Off" are considered. They are labeled as "0" (no default) and "1" (default), respectively.
 
 
 ## 2. Faeture Engineer
