@@ -24,7 +24,7 @@ This model makes the investors choose more easily from thousands of available lo
 - Label Target
 
 ## 2. Faeture Engineer
-| Type	| Feature Name |	Definition	|Solution|
+| Type	| Feature Name |	Definition	|Operation|
 | ------------- | ------------- |------------- | ------------- |
 | datetime | earliestcrline |the date the borrower's earliest reported credit line was opened| split to numeric month/year|
 | string  | emplength  |employment length in years|replace n/a; work year length to numeric|
