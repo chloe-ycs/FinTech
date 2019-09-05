@@ -12,6 +12,7 @@ The target of this project is to build a model that anticipates how future loans
 
 This model makes the investors choose more easily from thousands of available loans at Lending Club, by using machine learning to calculate which notes are more likely to perform better than others. 
 
+
 ## Required Python Libraries
 - numpy, pandas: numeric data and dataframe operation
 - matplotlib, seaborn: data visualizatin
@@ -21,7 +22,11 @@ This model makes the investors choose more easily from thousands of available lo
 
 ## 1. Data Preparation and EDA
 - Numerical and Categorical Data explore
-- Label Target
+- Label Target 
+### Label Target
+The Feature 'loanstatus' is used as target. Among all the 7 statuses, "Fully Paid" and "Charged Off" refer to those loans whose statuses are fixed, while other statuses may still change over time. 
+In this project only the loans with statuses of "Fully Paid" and "Charged Off" are considered. They are labeled as "0" (no default) and "1" (default), respectively.
+
 
 ## 2. Faeture Engineer
 | Type	| Feature Name |	Definition	|Operation|
@@ -72,5 +77,29 @@ https://www.lendingclub.com/info/download-data.action
 
 
 ### Reference
-https://www.lendacademy.com/lending-club-review/  <br>
-http://blog.lendingrobot.com/research/predicting-the-number-of-payments-in-peer-lending/ <br>
+[1] https://www.lendacademy.com/lending-club-review/  <br>
+[2] http://blog.lendingrobot.com/research/predicting-the-number-of-payments-in-peer-lending/ <br>
+
+### Normalization
+The number of payments made by a loan can be normalized as the ratio between the total number of payments by the term of the loan. A Payment Ratio of 0 means the loans hasn’t generated any payments yet. A Payment Ratio of 1 means all the installments were paid. For the sake of simplicity, we will also consider that loans that were paid-back early have been fully paid at maturity only.
+
+### Estimating Returns [Mathematical formula](http://blog.lendingrobot.com/research/predicting-the-number-of-payments-in-peer-lending/)
+n = S(1|z)*N
+n: number of payments for a loan
+S(1|z): probability of survival at maturity, can also be viewed as the payment ratio
+N: the loan term
+
+The Net Present Value of a loan of amount A paying n annuities of amount p is:
+![Alt text](https://github.com/chloe-ycs/FinTech/blob/master/ref/return_formula1.JPG?raw=true "Optional Title") <br>
+r: monthly discount rate
+A: Annuity, a series of identical payments over time
+n: number of annuities times
+p: paymont amount
+
+资金流入现值总额与资金流出现值总额相等、净现值等于零时的折现率。如果不使用电子计算机，内部收益率要用若干个折现率进行试算，直至找到净现值等于零或接近于零的那个折现率。When the NPV is 0, it means r the discount rate is such that the sum of the discounted payments equals the loan amount. This is the Internal Rate of Return. Unfortunately the IRR cannot be directly calculated. A computer program can, however, approximate it using subsequent iterations until the NPV is close enough to zero. A simple algorithm to speed up calculations called the secant method is:
+![Alt text](https://github.com/chloe-ycs/FinTech/blob/master/ref/return_formula2.JPG?raw=true "Optional Title") <br>
+
+Once the monthly return r has been determined, obtaining the annual rate of return simply requires us to annualize it:
+![Alt text](https://github.com/chloe-ycs/FinTech/blob/master/ref/return_formula3.JPG?raw=true "Optional Title") <br>
+
+
