@@ -59,11 +59,18 @@ In this project, only the loans with statuses of "Fully Paid" and "Charged Off" 
 - Feature importance
 
 ### Tuned best parameters:
-- colsample_bytree': 0.23031944035829088,
-- gamma': 1.7060478383477278,
-- max_depth': 7.938421102340797,
-- min_child_weight': 2.672125154299445,
-- subsample': 0.8746946441939958
+- colsample_bytree': 0.32221742682392707,
+- gamma': 1.888745445753438,
+- max_depth': 4,
+- min_child_weight': 19.984365517870163,
+- subsample': 0.7112055441024843
+
+- learning_rate = 0.01
+- n_estimators = 1500
+- seed = 1441
+- nthread = -1
+- scale_pos_weight = 1
+- eval_metric= 'auc'
 
 ### Model evaluation:
 The predicted default rate on the test set is about 0.2055
