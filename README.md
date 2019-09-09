@@ -54,16 +54,17 @@ In this project, only the loans with statuses of "Fully Paid" and "Charged Off" 
 ## 4. Model Tunning
 - Hyperparameter Tuning
 - Retrain model with tuned parameters
-- Model evaluation: ROC Curve
-- Validate on test data
 - Feature importance
+- Validate on test data
+- Model evaluation: ROC Curve
+- Thresholds
 
 ### Tuned best parameters:
-- colsample_bytree': 0.32221742682392707,
-- gamma': 1.888745445753438,
-- max_depth': 4,
-- min_child_weight': 19.984365517870163,
-- subsample': 0.7112055441024843
+- colsample_bytree'= 0.32221742682392707,
+- gamma'= 1.888745445753438,
+- max_depth'= 4,
+- min_child_weight'= 19.984365517870163,
+- subsample'= 0.7112055441024843
 
 - learning_rate = 0.01
 - n_estimators = 1500
@@ -73,9 +74,16 @@ In this project, only the loans with statuses of "Fully Paid" and "Charged Off" 
 - eval_metric= 'auc'
 
 ### Model evaluation:
-The predicted default rate on the test set is about 0.2055
+#### Feature importance
+The top 10 important features based on tuned models include Debt to Income Ratio, Installment, Annual Income, Interest Rate, Number of trades in past 24 months and so on.
 
+#### ROC Curve
+The predicted default rate on the test set is about 0.1355, very close to the average default rate of around 0.1373. 
+The result of model performance is visualized via the ROC curve. The AUC scores on the training and validation sets are about 0.70 and 0.74, and the AUC score on the testing set is about 0.70.
 
+#### Thresholds
+The best threshold of predicting default is determined based on Index value(= tpr - fpr), which optimizes the sensitivity and specificity.
+The 'TPR-FPR' maximizes at a threshold of 0.15. The maximum f1-score at the threshold of 0.15 is 0.34876, with a recall rate of 0.62, suggesting that 62% of total defalut loans is correctly classified by the model.
 
 
 ## Data Source
@@ -86,27 +94,5 @@ https://www.lendingclub.com/info/download-data.action
 ### Reference
 [1] https://www.lendacademy.com/lending-club-review/  <br>
 [2] http://blog.lendingrobot.com/research/predicting-the-number-of-payments-in-peer-lending/ <br>
-
-### Normalization
-The number of payments made by a loan can be normalized as the ratio between the total number of payments by the term of the loan. A Payment Ratio of 0 means the loans hasn’t generated any payments yet. A Payment Ratio of 1 means all the installments were paid. For the sake of simplicity, we will also consider that loans that were paid-back early have been fully paid at maturity only.
-
-### Estimating Returns [Mathematical formula](http://blog.lendingrobot.com/research/predicting-the-number-of-payments-in-peer-lending/)
-n = S(1|z)*N
-n: number of payments for a loan
-S(1|z): probability of survival at maturity, can also be viewed as the payment ratio
-N: the loan term
-
-The Net Present Value of a loan of amount A paying n annuities of amount p is:
-![Alt text](https://github.com/chloe-ycs/FinTech/blob/master/ref/return_formula1.JPG?raw=true "Optional Title") <br>
-r: monthly discount rate
-A: Annuity, a series of identical payments over time
-n: number of annuities times
-p: paymont amount
-
-资金流入现值总额与资金流出现值总额相等、净现值等于零时的折现率。如果不使用电子计算机，内部收益率要用若干个折现率进行试算，直至找到净现值等于零或接近于零的那个折现率。When the NPV is 0, it means r the discount rate is such that the sum of the discounted payments equals the loan amount. This is the Internal Rate of Return. Unfortunately the IRR cannot be directly calculated. A computer program can, however, approximate it using subsequent iterations until the NPV is close enough to zero. A simple algorithm to speed up calculations called the secant method is:
-![Alt text](https://github.com/chloe-ycs/FinTech/blob/master/ref/return_formula2.JPG?raw=true "Optional Title") <br>
-
-Once the monthly return r has been determined, obtaining the annual rate of return simply requires us to annualize it:
-![Alt text](https://github.com/chloe-ycs/FinTech/blob/master/ref/return_formula3.JPG?raw=true "Optional Title") <br>
 
 
