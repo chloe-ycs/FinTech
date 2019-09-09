@@ -1,4 +1,4 @@
-# FinTech - predict the defalut rate of loan status
+# FinTech - Predict the defalut rate of loan status
 ## Project Background
 Lending Club is the world leader in p2p lending having issued over $9 billion dollars in loans since they began in 2007. <br>
 
@@ -53,6 +53,8 @@ In this project, only the loans with statuses of "Fully Paid" and "Charged Off" 
 ## 4. Model Tunning
 - Hyperparameter Tuning
 - Retrain model with tuned parameters
+
+## 5. Model Evaluation
 - Feature importance
 - Validate on test data
 - Model evaluation: ROC Curve
