@@ -274,7 +274,7 @@ df.drop(dummy_feature, axis = 1, inplace=True)
 
 
 
-#############################
+######################
 ### modelling XGBoost
 ##################
 
@@ -411,9 +411,8 @@ draw_ROC(gbm, dtrain, dvalid, dtest, y_train, y_valid, y_test)
 ########################
 ### Predicted values ###
 ########################
-y_pred = gbm.predict(dtest) # gbm: gradient boosting machine
+y_pred = gbm.predict(dtest)
 print (y_pred.max(), y_pred.min(), y_pred.mean())
-# 0.70249295 0.006733872 0.13376142 就算是你觉得好到板上钉钉的贷款， 它的风险率是0.6%；很不好的贷款，它的风险率是70.2%
 
 
 ### Feature importance
@@ -427,11 +426,14 @@ df_importance['fscore'] = df_importance['fscore'] / df_importance['fscore'].sum(
 df_importance.sort_values(['fscore'], ascending=False, inplace=True)
 #df_importance
 
-# 把重要性前20画出来
+# 把重要性前10画出来
 plt.figure(figsize=(32, 32))
-df_importance[:20].plot(kind='barh', x='feature', y='fscore', legend=False, figsize=(6, 10))
-plt.title('XGBoost Feature Importance')
-plt.xlabel('relative importance')
+
+df_importance[:10].sort_values(by='fscore').plot(kind='barh', x='feature', y='fscore', legend=False, figsize=(10, 10))
+plt.tick_params(labelsize = 12)
+plt.xlabel('Relative Importance', fontsize = 12)
+plt.ylabel('Feature Name', fontsize = 12)
+plt.title('XGBoost Feature Importance',fontsize = 16)
 plt.gcf().savefig('feature_importance_xgb.png')
 
 
@@ -439,7 +441,6 @@ grade_importance = df_importance.query("feature=='grade'")
 subgrade_importance = df_importance.query("feature=='subgrade'")
 intrate_importance = df_importance.query("feature=='intrate'")
 df_importance.query("feature=='loanamnt'")
-
 
 plt.figure(figsize=(32, 32))
 df_importance.plot(kind='barh', x='feature', y='fscore', legend=False, figsize=(6, 10))
@@ -506,52 +507,56 @@ xgb_BO.maximize(init_points=5, n_iter=40)  # bayes_opt库只支持最大值
 xgb_BO.max
 xgb_BO.res
 
-
 xgb_BO_max = pd.DataFrame(xgb_BO.max).T
 
-
-# parameter set 1
-params = {'objective': 'binary:logistic'
-                  , 'booster': 'gbtree'
-                  , 'eta': 0.01
-                  , 'max_depth': 4
-                  , 'min_child_weight': 19.530287
-                  , 'subsample': 0.50750
-                  , 'colsample_bytree': 0.466057
-                  , 'gamma': 0.026735
-                  , 'seed': 1234
-                  , 'nthread': -1
-                  , 'silence': 1
-                  , 'eval_metric': 'auc'
-                  , 'scale_pos_weight': 1}
-
-watchlist = [(dtrain, 'train'), (dvalid, 'eval')]
-num_boost_round=10000
-gbm = xgb.train(params, dtrain, num_boost_round, evals=watchlist, early_stopping_rounds=50)
 
 
 
 #######################################
 #### retrain model with tuned parameters
 ######################################
-best_xgb_iteration = 1595 #1924
-clf_train = xgb.XGBClassifier(learning_rate = 0.01
-                  , n_estimators = best_xgb_iteration
-                  , max_depth = 4
-                  , min_child_weight = 19.530287
-                  , subsample = 0.50750
-                  , colsample_bytree = 0.466057
-                  , gamma = 0.026735
-                  , seed = 1234
-                  , nthread = -1
-                  , scale_pos_weight = 1
-                  )
+params = xgb_BO_max.iloc[1].to_dict()
 
-clf_train.fit(train_x, train_y)
+# xgboost.train()利用param列表设置模型参数
+# xgboost.XGBClassifier()利用函数参数设置模型参数。 用途是一样的
 
-draw_ROC(gbm, dtrain, dvalid, dtest, y_train, y_valid, y_test)
-# train高，test低，过拟合
+best_xgb_iteration = 1500  # 前面num_boost_round = 1500
 
+clf_train = xgb.XGBClassifier(learning_rate=0.01
+                              , n_estimators=best_xgb_iteration
+                              , max_depth=int(params['max_depth'])
+                              , min_child_weight=params['min_child_weight']
+                              , subsample=params['subsample']
+                              , colsample_bytree=params['colsample_bytree']
+                              , gamma=params['gamma']
+                              , seed=1441
+                              , nthread=-1
+                              , scale_pos_weight=1
+                              , eval_metric='auc'
+
+                              )
+
+params = {"objective": "binary:logistic",
+          "booster" : "gbtree",
+          "eta": 0.01,
+          "max_depth": 4,
+          "subsample": 0.5115777,
+          "colsample_bytree":  0.509529,
+          "min_child_weight": 13.93988,
+          "gamma":  0.335555,
+          "silent": 1,
+          "seed": 1441,
+          "eval_metric": "auc"
+          }
+
+watchlist = [(dtrain, 'train'), (dvalid, 'eval')]
+num_boost_round = 1500
+
+gbm2 = xgb.train(params,
+                dtrain,
+                num_boost_round,
+                evals = watchlist,
+                early_stopping_rounds = 50)
 
 '''
 clf = XGBClassifier(
@@ -576,16 +581,14 @@ seed=1000 #随机种子
 #eval_metric= 'auc'
 '''
 
-#############################
-### Validate on test data ###
-#############################
-y_pred = gbm.predict(dtest)
-print (y_pred.max(), y_pred.min(), y_pred.mean())   # 0.71161723 0.008794592 0.13552907
 
 
-##########################
-### Feature importance ###
-##########################
+########################
+### Model Evaluation ###
+########################
+
+### Feature importance
+
 importance2 = gbm.get_fscore()
 
 df_importance2 = pd.DataFrame.from_dict(importance2,orient='index').reset_index()
@@ -602,11 +605,50 @@ plt.gcf().savefig('feature_importance_xgb2.png')
 
 
 
+############################
+### Validate on test data
+y_pred = gbm.predict(dtest)
+print (y_pred.max(), y_pred.min(), y_pred.mean())   # 0.71161723 0.008794592 0.13552907
+
+
+### ROC Curve
+idx_0, thresholds_0, idx_1, thresholds_1, idx_2, thresholds_2 = \
+draw_ROC(gbm2, dtrain, dvalid, dtest, y_train, y_valid, y_test)
+
+plt.savefig('roc_xgb_retrain_autotuned.png')
+plt.show()
+# train高，test低，过拟合
+
+
+### Thresholds
+plt.figure(figsize = (8,8))
+plt.plot(thresholds_0, idx_0, label = "ROC curve - validation", color= 'r')
+plt.plot(thresholds_1, idx_1, label = "ROC curve - train", color= 'b')
+plt.plot(thresholds_2, idx_2, label = "ROC curve - test", color= 'g')
+plt.xlabel('Thresholds')
+plt.ylabel("TPR - FPR")
+
+
+def max_threshold( x_feature, y_feature):
+    y_max = max(y_feature)
+    x_max = x_feature[ y_feature.argmax()] # Find the x value corresponding to the max y value
+    return(x_max, y_max )
+
+print ('validation:',max_threshold(thresholds_0, idx_0))
+print ('train:',max_threshold(thresholds_1, idx_1))
+print ('test:',max_threshold(thresholds_2, idx_2))
 
 
 
-
-
+from sklearn.metrics import precision_recall_fscore_support
+for thrd in [0, 0.1, 0.14, 0.15, 0.2, 0.25, 0.5]:
+    test_results = []
+    for prob in y_pred:
+        if prob > thrd:
+            test_results.append(1)
+        else:
+            test_results.append(0)
+    print ("threshold:", thrd, precision_recall_fscore_support(y_test, test_results, pos_label=1, average='binary'))
 
 
 
