@@ -8,8 +8,7 @@ Lending Club categorizes borrowers into seven different loan grades: A through G
 
 From the investors' point of view, deciding which loans to invest in, or gauging the ongoing performance of a portfolio requires investors to be able to predict how much a given loan will return before reaching maturity. <br>
 
-The target of this project is to build a model that anticipates how future loans will behave and predicts the return, based on information from historic loans. Since the loan amount is known from inception, we ‘only’ need to predict the total amount paid back to investors to calculate the financial return. In other words, estimating the total amount paid back to investor only requires to estimate the number of payments made over a loan’s life, as long as the loan ‘survives’.<br>
-
+The target of this project is to give a model to predict the default rate of loanstatus for newly issued loans.
 This model makes the investors choose more easily from thousands of available loans at Lending Club, by using machine learning to calculate which notes are more likely to perform better than others. 
 
 
