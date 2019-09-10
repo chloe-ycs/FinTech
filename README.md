@@ -15,9 +15,9 @@ This model makes the investors choose more easily from thousands of available lo
 ## Required Python Libraries
 - numpy, pandas: numeric data and dataframe operation
 - matplotlib, seaborn: data visualizatin
-- sklearn: sci-kit Learn for model buidling and evaluation
-- xgboost: XGBoost algorithm
-- bayes_opt: Bayesian Optimization
+- sklearn: sci-kit Learn for machine learning
+- xgboost: xgboost algorithm
+- bayes_opt: bayesian optimization
 
 ## 1. Data Preparation and EDA
 - Numerical and Categorical Data explore
