@@ -27,7 +27,7 @@ The Feature 'loanstatus' is used as target. Among all the 7 statuses, "Fully Pai
 In this project, only the loans with statuses of "Fully Paid" and "Charged Off" are considered. They are labeled as "0" (no default) and "1" (default), respectively.
 
 
-## 2. Faeture Engineer
+## 2. Feature Engineer
 | Type	| Feature Name |	Definition	|Operation|
 | ------------- | ------------- |------------- | ------------- |
 | datetime | earliestcrline |the date the borrower's earliest reported credit line was opened| split to numeric month/year|
