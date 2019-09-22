@@ -97,3 +97,6 @@ https://www.lendingclub.com/info/download-data.action
 [2] http://blog.lendingrobot.com/research/predicting-the-number-of-payments-in-peer-lending/ <br>
 
 
+#### Tips
+If .ipynb file in the code folder fails to load, it can also be opened through [nbviewer](https://nbviewer.jupyter.org/github/chloe-ycs/)
+
