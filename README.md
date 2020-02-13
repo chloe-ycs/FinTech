@@ -48,7 +48,7 @@ In this project, only the loans with statuses of "Fully Paid" and "Charged Off" 
 - XGBoost - Preliminary manually parameter tuning based on stratified train-test split
 - Model evaluation: ROC Curve
 - Prediction
-- Feature importance
+- Feature importance - xgboost的sklearn包没有feature_importance这个量度，但是get_fscore()函数有相同的功能.F-Score（非模型评价的F1_score）是一种衡量特征在两类之间分辨能力的方法，F-score越大说明该特征的辨别能力越强。
 
 ## 4. Model Tunning
 - Hyperparameter Tuning
